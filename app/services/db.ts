@@ -1,20 +1,35 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import 'reflect-metadata';
 import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
+import Child from '../entities/Child';
+import Register from '../entities/Register';
 import Term from '../entities/Term';
 
-export async function init() {
+export async function open(): Promise<void> {
   const connectionOptions = await getConnectionOptions();
   const options = {
     ...connectionOptions,
     entities: [
+      Child,
+      Register,
       Term
     ],
-    synchronise: true
+    synchronize: true,
+    logging: true
   };
 
-  return await createConnection(options);
+  try {
+    await getConnection().close();
+    await createConnection(options);
+  } catch (err) {
+    await createConnection(options);
+  }
 }
 
-export async function close() {
-  await getConnection().close();
+export const connect = (handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>) => async (req: NextApiRequest, res: NextApiResponse) => {
+  await open();
+  await handler(req, res);
 }
+
+
+export const s = o => JSON.parse(JSON.stringify(o));
