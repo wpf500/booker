@@ -5,26 +5,23 @@ import Col from 'react-bootstrap/Col';
 import { getRepository } from "typeorm";
 
 import Layout from "@core/components/layout";
-import Child from "@core/entities/Child";
 import Term from "@core/entities/Term";
 
 import * as db from '@core/services/db';
 
 interface HomePageProps {
   terms: Term[]
-  children: Child[]
 }
 
 export const getServerSideProps: GetServerSideProps<HomePageProps> = async context => {
   await db.open();
   const terms = await getRepository(Term).find();
-  const children = await getRepository(Child).find();
   return {
-    props: db.s({terms, children})
+    props: db.s({terms})
   }
 }
 
-export default function HomePage({children, terms}: HomePageProps) {
+export default function HomePage({terms}: HomePageProps) {
   return (
     <Layout home>
       <h1>Overview</h1>
