@@ -5,5 +5,5 @@ export default function ExpensesPage() {
     <Layout>
       <h1>Expenses</h1>
     </Layout>
-  )
+  );
 }

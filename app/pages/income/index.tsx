@@ -5,5 +5,5 @@ export default function IncomePage() {
     <Layout>
       <h1>Income</h1>
     </Layout>
-  )
+  );
 }

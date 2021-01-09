@@ -8,61 +8,88 @@ import Table from "react-bootstrap/Table";
 import Register, { Session, SessionName } from "@core/entities/Register";
 
 interface RegisterSectionProps {
-  initialRegister: Register[]
+  initialRegister: Register[];
 }
 
 interface SessionInputProps {
-  session: Session,
-  onChange: (s: keyof Session) => (evt: ChangeEvent<HTMLInputElement>) => void
+  session: Session;
+  onChange: (s: keyof Session) => (evt: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function SessionInput({session, onChange}: SessionInputProps) {
+function SessionInput({ session, onChange }: SessionInputProps) {
   const colors = {
-    S: '#6d9eeb',
-    C: '#b4a7d6',
-    E: '#a4c2f4'
+    S: "#6d9eeb",
+    C: "#b4a7d6",
+    E: "#a4c2f4",
   };
 
-  const weeks = session && session.weeks || '';
-  const rate = session && session.rate || '';
+  const weeks = (session && session.weeks) || "";
+  const rate = (session && session.rate) || "";
 
   return (
     <InputGroup>
-      <FormControl type="text" size="sm" value={weeks}
-        onChange={onChange('weeks')} style={{backgroundColor: weeks ? '#eee' : ''}} />
-      <FormControl type="text" size="sm" value={rate}
-        onChange={onChange('rate')} style={{backgroundColor: rate ? colors[rate] || (isNaN(Number(rate)) ? 'red' : '#ccc') : ''}} />
+      <FormControl
+        type="text"
+        size="sm"
+        value={weeks}
+        onChange={onChange("weeks")}
+        style={{ backgroundColor: weeks ? "#eee" : "" }}
+      />
+      <FormControl
+        type="text"
+        size="sm"
+        value={rate}
+        onChange={onChange("rate")}
+        style={{
+          backgroundColor: rate
+            ? colors[rate] || (isNaN(Number(rate)) ? "red" : "#ccc")
+            : "",
+        }}
+      />
     </InputGroup>
   );
 }
 
-const sessionNames = [SessionName.Tue, SessionName.Wed, SessionName.ThuY, SessionName.ThuO];
+const sessionNames = [
+  SessionName.Tue,
+  SessionName.Wed,
+  SessionName.ThuY,
+  SessionName.ThuO,
+];
 
-export default function RegisterSection({initialRegister}: RegisterSectionProps) {
+export default function RegisterSection({
+  initialRegister,
+}: RegisterSectionProps) {
   const [register, setRegister] = useState(initialRegister);
 
   const rates = {
     S: 25,
     E: 22,
-    C: 20
+    C: 20,
   };
 
-  const setSessionValue = (entryNo: number, sessionName: SessionName) => (sessionKey: keyof Session) => (evt: ChangeEvent<HTMLInputElement>) => {
+  const setSessionValue = (entryNo: number, sessionName: SessionName) => (
+    sessionKey: keyof Session
+  ) => (evt: ChangeEvent<HTMLInputElement>) => {
     if (!register[entryNo].sessions[sessionName]) {
-      register[entryNo].sessions[sessionName] = {weeks: 0, rate: ''};
+      register[entryNo].sessions[sessionName] = { weeks: 0, rate: "" };
     }
-    register[entryNo].sessions[sessionName][sessionKey] = sessionKey === 'weeks' ? Number(evt.target.value) : evt.target.value;
-    setRegister(register.map(a => a));
-  }
+    register[entryNo].sessions[sessionName][sessionKey] =
+      sessionKey === "weeks" ? Number(evt.target.value) : evt.target.value;
+    setRegister(register.map((a) => a));
+  };
 
   function calcExpectedIncome(sessions: Record<string, Session>): string {
-    const income = sessionNames.map(name => {
-      const session = sessions[name];
-      return session && session.rate && session.weeks ?
-        (rates[session.rate] || session.rate) * session.weeks : 0;
-    }).reduce((a, b) => a + b, 0);
+    const income = sessionNames
+      .map((name) => {
+        const session = sessions[name];
+        return session && session.rate && session.weeks
+          ? (rates[session.rate] || session.rate) * session.weeks
+          : 0;
+      })
+      .reduce((a, b) => a + b, 0);
 
-    return isNaN(income) ? '?' : income.toLocaleString();
+    return isNaN(income) ? "?" : income.toLocaleString();
   }
 
   return (
@@ -82,10 +109,15 @@ export default function RegisterSection({initialRegister}: RegisterSectionProps)
         <tbody>
           {register.map((entry, entryNo) => (
             <tr key={entry.id}>
-              <td className="align-middle">{entry.child.firstName} {entry.child.lastName}</td>
-              {sessionNames.map(sessionName => (
+              <td className="align-middle">
+                {entry.child.firstName} {entry.child.lastName}
+              </td>
+              {sessionNames.map((sessionName) => (
                 <td key={sessionName} width={120}>
-                  <SessionInput onChange={setSessionValue(entryNo, sessionName)} session={entry.sessions[sessionName]} />
+                  <SessionInput
+                    onChange={setSessionValue(entryNo, sessionName)}
+                    session={entry.sessions[sessionName]}
+                  />
                 </td>
               ))}
               <td className="align-middle">
@@ -98,5 +130,5 @@ export default function RegisterSection({initialRegister}: RegisterSectionProps)
       </Table>
       <Button variant="success">Save</Button>
     </Form>
-  )
+  );
 }

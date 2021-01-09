@@ -2,16 +2,16 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export default class Child {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column()
-  firstName: string
+  firstName: string;
 
   @Column()
-  lastName: string
+  lastName: string;
 
   get fullName(): string {
-    return this.firstName + ' ' + this.lastName;
+    return this.firstName + " " + this.lastName;
   }
 }

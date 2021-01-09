@@ -1,21 +1,17 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import 'reflect-metadata';
-import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
-import Child from '@core/entities/Child';
-import Register from '@core/entities/Register';
-import Term from '@core/entities/Term';
+import { NextApiRequest, NextApiResponse } from "next";
+import "reflect-metadata";
+import { createConnection, getConnection, getConnectionOptions } from "typeorm";
+import Child from "@core/entities/Child";
+import Register from "@core/entities/Register";
+import Term from "@core/entities/Term";
 
 export async function open(): Promise<void> {
   const connectionOptions = await getConnectionOptions();
   const options = {
     ...connectionOptions,
-    entities: [
-      Child,
-      Register,
-      Term
-    ],
+    entities: [Child, Register, Term],
     synchronize: true,
-    logging: true
+    logging: true,
   };
 
   try {
@@ -26,10 +22,11 @@ export async function open(): Promise<void> {
   }
 }
 
-export const connect = (handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>) => async (req: NextApiRequest, res: NextApiResponse) => {
+export const connect = (
+  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+) => async (req: NextApiRequest, res: NextApiResponse) => {
   await open();
   await handler(req, res);
-}
+};
 
-
-export const s = o => JSON.parse(JSON.stringify(o));
+export const s = (o) => JSON.parse(JSON.stringify(o));

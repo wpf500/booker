@@ -1,28 +1,30 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps } from "next";
 import Table from "react-bootstrap/Table";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button'
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { getRepository } from 'typeorm';
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { getRepository } from "typeorm";
 
 import Layout from "@core/components/layout";
-import Child from '@core/entities/Child';
-import * as db from '@core/services/db';
+import Child from "@core/entities/Child";
+import * as db from "@core/services/db";
 
 interface ChildrenPageProps {
-  children: Child[]
+  children: Child[];
 }
 
-export const getServerSideProps: GetServerSideProps<ChildrenPageProps> = async context => {
+export const getServerSideProps: GetServerSideProps<ChildrenPageProps> = async (
+  context
+) => {
   await db.open();
   const children = await getRepository(Child).find();
   return {
-    props: db.s({children})
-  }
-}
+    props: db.s({ children }),
+  };
+};
 
-export default function ChildrenPage({children}: ChildrenPageProps) {
+export default function ChildrenPage({ children }: ChildrenPageProps) {
   return (
     <Layout>
       <Row>
@@ -52,7 +54,7 @@ export default function ChildrenPage({children}: ChildrenPageProps) {
           </tr>
         </thead>
         <tbody>
-          {children.map(child => (
+          {children.map((child) => (
             <tr key={child.id}>
               <td>{child.firstName}</td>
               <td>{child.lastName}</td>
@@ -61,5 +63,5 @@ export default function ChildrenPage({children}: ChildrenPageProps) {
         </tbody>
       </Table>
     </Layout>
-  )
+  );
 }
