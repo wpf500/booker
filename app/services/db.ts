@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import 'reflect-metadata';
 import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
-import Child from '../entities/Child';
-import Register from '../entities/Register';
-import Term from '../entities/Term';
+import Child from '@core/entities/Child';
+import Register from '@core/entities/Register';
+import Term from '@core/entities/Term';
 
 export async function open(): Promise<void> {
   const connectionOptions = await getConnectionOptions();

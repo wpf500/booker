@@ -4,8 +4,8 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import Child from "../entities/Child";
-import { fetchApi } from "../services/api";
+import Child from "@core/entities/Child";
+import { fetchApi } from "@core/services/api";
 
 interface ChildrenSectionProps {
   termId: string

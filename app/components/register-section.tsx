@@ -5,7 +5,7 @@ import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import Table from "react-bootstrap/Table";
 
-import Register, { Session, SessionName } from "../entities/Register";
+import Register, { Session, SessionName } from "@core/entities/Register";
 
 interface RegisterSectionProps {
   initialRegister: Register[]

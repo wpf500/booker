@@ -1,15 +1,15 @@
 import { GetServerSideProps } from "next";
 import { createQueryBuilder, getRepository, In, Not } from "typeorm";
 
-import ChildrenSection from "../../components/children-section";
-import Layout from "../../components/layout";
-import RegisterSection from "../../components/register-section";
+import ChildrenSection from "@core/components/children-section";
+import Layout from "@core/components/layout";
+import RegisterSection from "@core/components/register-section";
 
-import Child from "../../entities/Child";
-import Register from "../../entities/Register";
-import Term from "../../entities/Term";
+import Child from "@core/entities/Child";
+import Register from "@core/entities/Register";
+import Term from "@core/entities/Term";
 
-import * as db from '../../services/db';
+import * as db from '@core/services/db';
 
 interface TermProps {
   term: Term,
