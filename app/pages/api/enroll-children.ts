@@ -1,4 +1,3 @@
-import { loadGetInitialProps } from "next/dist/next-server/lib/utils";
 import { createQueryBuilder, getRepository, In, Not } from "typeorm";
 import Register from "@core/entities/Register";
 import * as db from "@core/services/db";
