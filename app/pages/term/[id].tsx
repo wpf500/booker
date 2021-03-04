@@ -10,7 +10,6 @@ import Register from "@core/entities/Register";
 import Term from "@core/entities/Term";
 
 import { fetchApi } from "@core/services/api";
-import RatesSection from "@core/components/RatesSection";
 
 interface TermProps {
   term: Term;
@@ -41,9 +40,6 @@ export default function TermPage(props: TermProps) {
         initialEnrolledChildren={register.map(e => e.child)}
         initialOtherChildren={otherChildren}
       />
-      <hr />
-      <h3>Rates</h3>
-      <RatesSection term={term} />
       <hr />
       <h3>Finance register</h3>
       <RegisterSection term={term} initialRegister={register} />
