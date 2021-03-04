@@ -5,12 +5,15 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import Child from "@core/entities/Child";
+import Term from "@core/entities/Term";
+
 import { fetchApi } from "@core/services/api";
 
 interface ChildrenSectionProps {
-  termId: string;
+  term: Term;
   initialEnrolledChildren: Child[];
   initialOtherChildren: Child[];
+  onChange(): void
 }
 
 function sortByName(a: Child, b: Child) {
@@ -18,9 +21,10 @@ function sortByName(a: Child, b: Child) {
 }
 
 export default function ChildrenSection({
-  termId,
+  term,
   initialEnrolledChildren,
   initialOtherChildren,
+  onChange
 }: ChildrenSectionProps) {
   const [enrolledChildren, setEnrolledChildren] = useState(
     initialEnrolledChildren.map((a) => a).sort(sortByName)
@@ -77,9 +81,10 @@ export default function ChildrenSection({
     setIsSaving(true);
     try {
       await fetchApi("/enroll-children", {
-        term: termId,
+        term: term.id,
         children: enrolledChildren.map((c) => c.id),
       });
+      onChange();
     } finally {
       setIsSaving(false);
     }

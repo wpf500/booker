@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import { createQueryBuilder, getRepository, In, Not } from "typeorm";
+import useSWR from 'swr';
 
 import ChildrenSection from "@core/components/ChildrenSection";
 import Layout from "@core/components/layout";
@@ -9,7 +9,8 @@ import Child from "@core/entities/Child";
 import Register from "@core/entities/Register";
 import Term from "@core/entities/Term";
 
-import * as db from "@core/services/db";
+import { fetchApi } from "@core/services/api";
+import RatesSection from "@core/components/RatesSection";
 
 interface TermProps {
   term: Term;
@@ -20,37 +21,14 @@ interface TermProps {
 export const getServerSideProps: GetServerSideProps<TermProps> = async (
   context
 ) => {
-  await db.open();
-
-  const term = await getRepository(Term).findOne({
-    where: {id: context.params!.id as string},
-    relations: ['rates']
-  });
-
-  if (term) {
-    const register = await createQueryBuilder(Register, "r")
-      .leftJoinAndSelect("r.child", "c")
-      .where("r.term = :termId", { termId: term.id })
-      .orderBy({
-        "c.firstName": "ASC",
-        "c.lastName": "ASC",
-      })
-      .getMany();
-    const otherChildren = await getRepository(Child).find({
-      where: { id: Not(In(register.map((e) => e.child.id))) },
-    });
-
-    return {
-      props: db.s({ term, register, otherChildren }),
-    };
-  } else {
-    return {
-      notFound: true
-    };
-  }
+  const data = await fetchApi('/get-term/' + context.query.id);
+  return data ? {props: data} : {notFound: true};
 };
 
-export default function TermPage({ term, register, otherChildren }: TermProps) {
+export default function TermPage(props: TermProps) {
+  const {data, mutate} = useSWR('/get-term/' + props.term.id, fetchApi);
+  const {term, register, otherChildren}: TermProps = data || props;
+
   return (
     <Layout>
       <h1>{term.name}</h1>
@@ -58,15 +36,17 @@ export default function TermPage({ term, register, otherChildren }: TermProps) {
       <hr />
       <h3>Children</h3>
       <ChildrenSection
-        termId={term.id}
-        initialEnrolledChildren={register.map((e) => e.child)}
+        onChange={mutate}
+        term={term}
+        initialEnrolledChildren={register.map(e => e.child)}
         initialOtherChildren={otherChildren}
       />
       <hr />
       <h3>Rates</h3>
+      <RatesSection term={term} />
       <hr />
       <h3>Finance register</h3>
-      <RegisterSection initialRegister={register} />
+      <RegisterSection term={term} initialRegister={register} />
     </Layout>
   );
 }

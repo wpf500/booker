@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
@@ -6,25 +6,28 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Table from "react-bootstrap/Table";
 
 import Register, { Session, SessionName } from "@core/entities/Register";
+import Term from "@core/entities/Term";
+import TermRate from "@core/entities/TermRate";
+
+import { fetchApi } from "@core/services/api";
 
 interface RegisterSectionProps {
+  term: Term
   initialRegister: Register[];
 }
 
 interface SessionInputProps {
-  session: Session;
-  onChange: (s: keyof Session) => (evt: ChangeEvent<HTMLInputElement>) => void;
+  rates: TermRate[];
+  session?: Session;
+  onChange<K extends keyof Session>(s: K, value: Session[K]): void;
 }
 
-function SessionInput({ session, onChange }: SessionInputProps) {
-  const colors = {
-    S: "#6d9eeb",
-    C: "#b4a7d6",
-    E: "#a4c2f4",
-  };
+function SessionInput({ rates, session, onChange }: SessionInputProps) {
 
-  const weeks = (session && session.weeks) || "";
-  const rate = (session && session.rate) || "";
+  const weeks = session?.weeks || '';
+  const rate = session?.rate || '';
+
+  const termRate = rate ? rates.find(r => r.code === rate) : null;
 
   return (
     <InputGroup>
@@ -32,18 +35,17 @@ function SessionInput({ session, onChange }: SessionInputProps) {
         type="text"
         size="sm"
         value={weeks}
-        onChange={onChange("weeks")}
+        onChange={evt => onChange("weeks", Number(evt.target.value))}
         style={{ backgroundColor: weeks ? "#eee" : "" }}
       />
       <FormControl
         type="text"
         size="sm"
         value={rate}
-        onChange={onChange("rate")}
+        onChange={evt => onChange("rate", evt.target.value)}
         style={{
-          backgroundColor: rate
-            ? colors[rate] || (isNaN(Number(rate)) ? "red" : "#ccc")
-            : "",
+          backgroundColor: rate === null || rate === "" ? "" :
+            termRate?.color || (isNaN(Number(rate)) ? "red" : "#ccc")
         }}
       />
     </InputGroup>
@@ -57,43 +59,54 @@ const sessionNames = [
   SessionName.ThuO,
 ];
 
-export default function RegisterSection({
-  initialRegister,
-}: RegisterSectionProps) {
+export default function RegisterSection({term, initialRegister}: RegisterSectionProps) {
   const [register, setRegister] = useState(initialRegister);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const rates = {
-    S: 25,
-    E: 22,
-    C: 20,
-  };
-
-  const setSessionValue = (entryNo: number, sessionName: SessionName) => (
-    sessionKey: keyof Session
-  ) => (evt: ChangeEvent<HTMLInputElement>) => {
-    if (!register[entryNo].sessions[sessionName]) {
-      register[entryNo].sessions[sessionName] = { weeks: 0, rate: "" };
+  useEffect(() => {
+    if (!unsavedChanges) {
+      setRegister(initialRegister);
     }
-    register[entryNo].sessions[sessionName][sessionKey] =
-      sessionKey === "weeks" ? Number(evt.target.value) : evt.target.value;
-    setRegister(register.map((a) => a));
-  };
+  }, [initialRegister])
 
-  function calcExpectedIncome(sessions: Record<string, Session>): string {
+  function setSessionValue<Key extends keyof Session>(entryNo: number, sessionName: SessionName) {
+    return (sessionKey: Key, value: Session[Key]) => {
+      let session = register[entryNo].sessions[sessionName] || {rate: '', weeks: 0};
+      session[sessionKey] = value;
+
+      register[entryNo].sessions[sessionName] = session;
+      setRegister(register.map((a) => a));
+      setUnsavedChanges(true);
+    };
+  }
+
+  function calcExpectedIncome(sessions: Partial<Record<string, Session>>): string {
     const income = sessionNames
       .map((name) => {
         const session = sessions[name];
-        return session && session.rate && session.weeks
-          ? (rates[session.rate] || session.rate) * session.weeks
-          : 0;
+        return session ?
+          session.weeks * (term.rates.find(r => r.code === session.rate)?.price || Number(session.rate)) :
+          0;
       })
       .reduce((a, b) => a + b, 0);
 
     return isNaN(income) ? "?" : income.toLocaleString();
   }
 
+  async function handleSubmit(evt: FormEvent<HTMLFormElement>) {
+    evt.preventDefault();
+    setIsSaving(true);
+    try {
+      await fetchApi("/save-register", {register});
+      setUnsavedChanges(false);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
-    <Form>
+    <Form method="POST" onSubmit={handleSubmit}>
       <Table striped>
         <thead>
           <tr>
@@ -115,6 +128,7 @@ export default function RegisterSection({
               {sessionNames.map((sessionName) => (
                 <td key={sessionName} width={120}>
                   <SessionInput
+                    rates={term.rates}
                     onChange={setSessionValue(entryNo, sessionName)}
                     session={entry.sessions[sessionName]}
                   />
@@ -128,7 +142,9 @@ export default function RegisterSection({
           ))}
         </tbody>
       </Table>
-      <Button variant="success">Save</Button>
+      <Button variant="success" type="submit" disabled={isSaving}>
+        {isSaving ? "Saving..." : "Save"}
+      </Button>
     </Form>
   );
 }

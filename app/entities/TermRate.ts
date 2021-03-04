@@ -11,4 +11,7 @@ export default class TermRate {
 
   @Column()
   price!: number
+
+  @Column()
+  color!: string
 }

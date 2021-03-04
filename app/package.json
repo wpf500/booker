@@ -24,6 +24,7 @@
     "remark-html": "^13.0.1",
     "sass": "^1.32.0",
     "superjson": "^1.4.1",
+    "swr": "^0.4.2",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 const baseUrl = "http://localhost:3000/api";
 
-export async function fetchApi(url: string, body?): Promise<any> {
+export async function fetchApi(url: string, body?: any): Promise<any> {
   const resp = await fetch(baseUrl + url, {
     method: body === undefined ? "GET" : "POST",
     body: JSON.stringify(body),
