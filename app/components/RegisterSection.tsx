@@ -107,7 +107,7 @@ export default function RegisterSection({term, initialRegister}: RegisterSection
       <p>Total expected income: {showAmount(totalIncome)}</p>
 
       <Form method="POST" onSubmit={handleSubmit}>
-        <Table striped>
+        <Table striped borderless size="sm">
           <thead>
             <tr>
               <th>Child</th>
@@ -115,8 +115,8 @@ export default function RegisterSection({term, initialRegister}: RegisterSection
               <th>Wed</th>
               <th>Thu/y</th>
               <th>Thu/o</th>
-              <th>Expected</th>
-              <th>Actual</th>
+              <th className="text-right">Expected</th>
+              <th className="text-right">Actual</th>
             </tr>
           </thead>
           <tbody>
@@ -134,10 +134,10 @@ export default function RegisterSection({term, initialRegister}: RegisterSection
                     />
                   </td>
                 ))}
-                <td className="align-middle">
+                <td className="align-middle text-right" width={90}>
                   {showAmount(calcIncome(entry))}
                 </td>
-                <td className="align-middle">-</td>
+                <td className="align-middle text-right" width={90}>-</td>
               </tr>
             ))}
           </tbody>
