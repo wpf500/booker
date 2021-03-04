@@ -5,16 +5,16 @@ import Term from "./Term";
 @Entity()
 export default class Income {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column()
-  date: string;
+  date!: Date;
 
-  @Column()
-  amount: number;
+  @Column({ type: 'float' })
+  amount!: number;
 
   @Column({ type: "text" })
-  descrription: string;
+  description!: string;
 
   @ManyToOne(() => Term, { nullable: true })
   term?: Term;

@@ -29,4 +29,4 @@ export const connect = (
   await handler(req, res);
 };
 
-export const s = (o) => JSON.parse(JSON.stringify(o));
+export const s = (o: any) => JSON.parse(JSON.stringify(o));

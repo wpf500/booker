@@ -1,4 +1,4 @@
-import { FormEvent, MutableRefObject, useRef, useState } from "react";
+import { FormEvent, RefObject, useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -30,19 +30,19 @@ export default function ChildrenSection({
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const enrolledChildrenRef = useRef<HTMLSelectElement>();
-  const otherChildrenRef = useRef<HTMLSelectElement>();
+  const enrolledChildrenRef = useRef<HTMLSelectElement>(null);
+  const otherChildrenRef = useRef<HTMLSelectElement>(null);
 
   function moveTo(
-    fromRef: MutableRefObject<HTMLSelectElement>,
+    fromRef: RefObject<HTMLSelectElement>,
     fromList: Child[],
     toList: Child[]
   ) {
-    const selectedChildrenIds = Array.from(fromRef.current.selectedOptions).map(
+    const selectedChildrenIds = Array.from(fromRef.current!.selectedOptions).map(
       (o) => o.value
     );
     const selectedChildren = selectedChildrenIds.map((id) =>
-      fromList.find((c) => c.id === id)
+      fromList.find((c) => c.id === id) as Child
     );
     const newFromList = fromList
       .filter((c) => selectedChildrenIds.indexOf(c.id) === -1)

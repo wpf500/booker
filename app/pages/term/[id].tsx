@@ -22,22 +22,28 @@ export const getServerSideProps: GetServerSideProps<TermProps> = async (
 ) => {
   await db.open();
 
-  const term = await getRepository(Term).findOne(context.params.id as string);
-  const register = await createQueryBuilder(Register, "r")
-    .leftJoinAndSelect("r.child", "c")
-    .where("r.term = :termId", { termId: term.id })
-    .orderBy({
-      "c.firstName": "ASC",
-      "c.lastName": "ASC",
-    })
-    .getMany();
-  const otherChildren = await getRepository(Child).find({
-    where: { id: Not(In(register.map((e) => e.child.id))) },
-  });
+  const term = await getRepository(Term).findOne(context.params!.id as string);
+  if (term) {
+    const register = await createQueryBuilder(Register, "r")
+      .leftJoinAndSelect("r.child", "c")
+      .where("r.term = :termId", { termId: term.id })
+      .orderBy({
+        "c.firstName": "ASC",
+        "c.lastName": "ASC",
+      })
+      .getMany();
+    const otherChildren = await getRepository(Child).find({
+      where: { id: Not(In(register.map((e) => e.child.id))) },
+    });
 
-  return {
-    props: db.s({ term, register, otherChildren }),
-  };
+    return {
+      props: db.s({ term, register, otherChildren }),
+    };
+  } else {
+    return {
+      notFound: true
+    };
+  }
 };
 
 export default function TermPage({ term, register, otherChildren }: TermProps) {
