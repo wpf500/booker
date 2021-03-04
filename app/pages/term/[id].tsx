@@ -1,9 +1,9 @@
 import { GetServerSideProps } from "next";
 import { createQueryBuilder, getRepository, In, Not } from "typeorm";
 
-import ChildrenSection from "@core/components/children-section";
+import ChildrenSection from "@core/components/ChildrenSection";
 import Layout from "@core/components/layout";
-import RegisterSection from "@core/components/register-section";
+import RegisterSection from "@core/components/RegisterSection";
 
 import Child from "@core/entities/Child";
 import Register from "@core/entities/Register";
@@ -22,7 +22,11 @@ export const getServerSideProps: GetServerSideProps<TermProps> = async (
 ) => {
   await db.open();
 
-  const term = await getRepository(Term).findOne(context.params!.id as string);
+  const term = await getRepository(Term).findOne({
+    where: {id: context.params!.id as string},
+    relations: ['rates']
+  });
+
   if (term) {
     const register = await createQueryBuilder(Register, "r")
       .leftJoinAndSelect("r.child", "c")
@@ -58,6 +62,8 @@ export default function TermPage({ term, register, otherChildren }: TermProps) {
         initialEnrolledChildren={register.map((e) => e.child)}
         initialOtherChildren={otherChildren}
       />
+      <hr />
+      <h3>Rates</h3>
       <hr />
       <h3>Finance register</h3>
       <RegisterSection initialRegister={register} />

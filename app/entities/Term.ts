@@ -1,13 +1,17 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import TermRate from "./TermRate";
 
 @Entity()
 export default class Term extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  weeks: number;
+  weeks!: number;
+
+  @OneToMany('TermRate', 'term')
+  rates!: TermRate[];
 }

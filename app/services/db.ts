@@ -1,15 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import "reflect-metadata";
 import { createConnection, getConnection, getConnectionOptions } from "typeorm";
+
 import Child from "@core/entities/Child";
 import Register from "@core/entities/Register";
 import Term from "@core/entities/Term";
+import TermRate from "@core/entities/TermRate";
 
 export async function open(): Promise<void> {
   const connectionOptions = await getConnectionOptions();
   const options = {
     ...connectionOptions,
-    entities: [Child, Register, Term],
+    entities: [Child, Register, Term, TermRate],
     synchronize: true,
     logging: true,
   };

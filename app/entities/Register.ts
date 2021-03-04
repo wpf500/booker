@@ -24,14 +24,14 @@ export interface Session {
 @Index(["child", "term"], { unique: true })
 export default class Register {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
-  @ManyToOne((type) => Child)
-  child: Child;
+  @ManyToOne(() => Child)
+  child!: Child;
 
-  @ManyToOne((type) => Term)
-  term: Term;
+  @ManyToOne(() => Term)
+  term!: Term;
 
   @Column({ type: "jsonb", default: {} })
-  sessions: Partial<Record<SessionName, Session>>;
+  sessions!: Partial<Record<SessionName, Session>>;
 }
